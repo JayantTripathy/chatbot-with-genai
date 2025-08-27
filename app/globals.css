@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800;
+  }
+}
+
+@layer components {
+  .chat-bubble {
+    @apply max-w-[80%] rounded-3xl px-5 py-4 shadow-lg backdrop-blur-sm;
+  }
+  
+  .chat-bubble-user {
+    @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white ml-auto shadow-xl hover:shadow-2xl transition-all duration-300;
+  }
+  
+  .chat-bubble-bot {
+    @apply bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 shadow-lg backdrop-blur-sm;
+  }
+  
+  .typing-indicator {
+    @apply flex space-x-1.5;
+  }
+  
+  .typing-dot {
+    @apply w-2.5 h-2.5 bg-blue-400 dark:bg-blue-300 rounded-full animate-typing;
+  }
+  
+  .typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  /* Enhanced animations */
+  .message-enter {
+    animation: messageEnter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .bubble-pop {
+    animation: bubblePop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  .input-focus {
+    animation: inputFocus 0.3s ease-out;
+  }
+  
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/20 dark:bg-gray-900/20 border border-white/30 dark:border-gray-700/30;
+  }
+}
+
+/* Custom scrollbar for chat container */
+.chat-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Dark mode scrollbar */
+.dark .chat-container::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark .chat-container::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Touch-friendly button styles */
+.touch-button {
+  @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+} 
