@@ -273,19 +273,19 @@ Typical Architecture for Advanced GenAI Use Case
 
 🔹 Architecture of GenAI with Azure AI Foundry + Your Knowledge
 
-User (Web/Frontend)
-        |
-        v
-Your API (.NET Core / Node.js)
-        |
-        v
-Azure AI Foundry
-   ├── OpenAI Model (GPT-4/3.5)
-   ├── Azure AI Search (Vector DB)
-   └── Prompt Flow / Orchestration
-        |
-        v
-Your Data (Blob Storage + Index in AI Search)
+      User (Web/Frontend)
+              |
+              v
+      Your API (.NET Core / Node.js)
+              |
+              v
+      Azure AI Foundry
+         ├── OpenAI Model (GPT-4/3.5)
+         ├── Azure AI Search (Vector DB)
+         └── Prompt Flow / Orchestration
+              |
+              v
+      Your Data (Blob Storage + Index in AI Search)
 
 
 
@@ -360,13 +360,15 @@ Higher complexity in code + DevOps.
 Development time increases.
 
 Side-by-Side Comparison
-Feature	GenAI + Your Knowledge	OpenAI + AI Search + Blob
-Setup Time	🚀 Fast (no AI Search setup)	⚙️ Slower (need Blob + AI Search + pipeline)
-Control	🔒 Limited	🎛️ Full control over search + indexing
-Scaling	✅ Managed automatically	✅ Customizable, but you manage scaling
-Cost	💰 May be higher (bundled, black box)	💰 More cost-efficient if optimized
-Best for	POCs, small-medium projects	Large, enterprise-scale, custom needs
-Endpoint Call	1 API call (Foundry endpoint)	Multiple calls (Search + OpenAI) orchestrated in your API
+   | Feature       | **GenAI + Your Knowledge**            | **OpenAI + AI Search + Blob**                             |
+   | ------------- | ------------------------------------- | --------------------------------------------------------- |
+   | Setup Time    | 🚀 Fast (no AI Search setup)          | ⚙️ Slower (need Blob + AI Search + pipeline)              |
+   | Control       | 🔒 Limited                            | 🎛️ Full control over search + indexing                   |
+   | Scaling       | ✅ Managed automatically               | ✅ Customizable, but you manage scaling                    |
+   | Cost          | 💰 May be higher (bundled, black box) | 💰 More cost-efficient if optimized                       |
+   | Best for      | POCs, small-medium projects           | Large, enterprise-scale, custom needs                     |
+   | Endpoint Call | 1 API call (Foundry endpoint)         | Multiple calls (Search + OpenAI) orchestrated in your API |
+
 
 👉 Rule of Thumb
 
