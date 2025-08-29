@@ -190,4 +190,186 @@ If you encounter any issues:
 - Built with [Next.js](https://nextjs.org/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
 - Icons from [Lucide React](https://lucide.dev/)
-- Powered by [Azure OpenAI](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service) 
+- Powered by [Azure OpenAI](https://azure.microsoft.com/en-us/products/cognitive-services/openai-service)
+
+Architecture: Azure OpenAI + Azure AI Search + Blob + Foundry (Local Dev)
+
+                        ┌─────────────────────────────┐
+                        │        Your Local App        │
+                        │   (CLI / Script / Postman)   │
+                        └────────────┬────────────────┘
+                                     │
+                            [1] User question input
+                                     ▼
+                        ┌─────────────────────────────┐
+                        │      Azure AI Search         │
+                        │ jt-search-chatassist-dev-eus │
+                        └────────────┬────────────────┘
+                                     │
+                    [2] Retrieves top-k relevant documents
+                                     ▼
+                        ┌─────────────────────────────┐
+                        │     Azure Blob Storage       │
+                        │ jt-blob-chatassist-dev-eus   │
+                        └────────────┬────────────────┘
+                                     │
+                   [3] Documents are indexed via Foundry pipeline
+                                     ▼
+                        ┌─────────────────────────────┐
+                        │      Azure AI Foundry        │
+                        │ jt-foundry-chatassist-dev-eus│
+                        └────────────┬────────────────┘
+                                     │
+                   [4] Passes search result context to GPT
+                                     ▼
+                        ┌─────────────────────────────┐
+                        │       Azure OpenAI GPT       │
+                        │ jt-aoai-chatassist-dev-eus   │
+                        └────────────┬────────────────┘
+                                     │
+                         [5] GPT generates final answer
+                                     ▼
+                        ┌─────────────────────────────┐
+                        │        Local Output          │
+                        │  (Console / JSON / Postman)  │
+                        └─────────────────────────────┘
+
+
+Typical Architecture for Advanced GenAI Use Case
+
+               ┌─────────────────────────────┐
+               │        Users (Chat UI)      │
+               └────────────┬────────────────┘
+                            │
+                  User query/question
+                            ▼
+               ┌─────────────────────────────┐
+               │      Azure OpenAI GPT       │
+               │ (jt-gen-open-ai-11)         │
+               └────────────┬────────────────┘
+                            │
+        Sends query to Search engine with context
+                            ▼
+               ┌─────────────────────────────┐
+               │     Azure AI Search Index   │
+               │ (jt-genai-az-ai-search-1)   │
+               └────────────┬────────────────┘
+                            │
+             Retrieves top-k relevant docs
+                            ▼
+               ┌─────────────────────────────┐
+               │     Blob Storage / SQL      │
+               │ (jtmyblobstorage1 etc.)     │
+               └─────────────────────────────┘
+                            │
+           Retrieved data sent back to OpenAI
+                            ▼
+               ┌─────────────────────────────┐
+               │ GPT Generates Grounded Answer│
+               └─────────────────────────────┘
+                            │
+                   Response to User (Chat)
+
+
+🔹 Architecture of GenAI with Azure AI Foundry + Your Knowledge
+
+User (Web/Frontend)
+        |
+        v
+Your API (.NET Core / Node.js)
+        |
+        v
+Azure AI Foundry
+   ├── OpenAI Model (GPT-4/3.5)
+   ├── Azure AI Search (Vector DB)
+   └── Prompt Flow / Orchestration
+        |
+        v
+Your Data (Blob Storage + Index in AI Search)
+
+
+
+
+
+Option 1: GenAI with Azure AI Foundry + "Your Knowledge"
+
+This is the built-in retrieval-augmented generation (RAG) capability inside Azure AI Foundry.
+
+You just upload documents (PDF, text, etc.) into “Your Knowledge”.
+
+Azure AI Foundry automatically:
+
+Stores them in an internal vector index (you don’t manage Azure AI Search directly).
+
+Handles embedding generation + chunking.
+
+Integrates with Azure OpenAI for responses.
+
+Your app calls one endpoint (the Foundry deployed endpoint) → it does both search + LLM response.
+
+✅ Benefits
+
+No need to manage Azure AI Search, Blob, or indexing pipelines yourself.
+
+Faster development (no infra setup).
+
+Great for POCs, small/medium workloads, quick business solutions.
+
+Security & access control integrated.
+
+❌ Limitations
+
+Limited customization (can’t tune chunking, re-ranking, hybrid search, custom metadata filters deeply).
+
+Storage and indexing managed internally (less control over scaling & cost optimizations).
+
+Not ideal for very large datasets or when you need full control over search/index pipeline.
+
+Option 2: Azure OpenAI + Azure AI Search + Blob + Foundry (Local Dev)
+
+This is the modular architecture where you manage each component.
+
+Documents go to Blob Storage.
+
+You index them into Azure AI Search with embeddings.
+
+Your .NET Core API orchestrates:
+
+Query → Azure AI Search → gets top-k docs.
+
+Passes docs as context to Azure OpenAI (GPT).
+
+Returns final answer.
+
+✅ Benefits
+
+Full control of vector search (hybrid search, filters, synonyms, re-ranking).
+
+Better for large datasets and enterprise-scale workloads.
+
+Can customize pipelines (chunking strategies, multi-index search, data enrichment).
+
+Easier integration with other external systems (ERP, CRM, APIs).
+
+❌ Limitations
+
+More infra to manage (Search, Blob, pipelines, monitoring).
+
+Higher complexity in code + DevOps.
+
+Development time increases.
+
+Side-by-Side Comparison
+Feature	GenAI + Your Knowledge	OpenAI + AI Search + Blob
+Setup Time	🚀 Fast (no AI Search setup)	⚙️ Slower (need Blob + AI Search + pipeline)
+Control	🔒 Limited	🎛️ Full control over search + indexing
+Scaling	✅ Managed automatically	✅ Customizable, but you manage scaling
+Cost	💰 May be higher (bundled, black box)	💰 More cost-efficient if optimized
+Best for	POCs, small-medium projects	Large, enterprise-scale, custom needs
+Endpoint Call	1 API call (Foundry endpoint)	Multiple calls (Search + OpenAI) orchestrated in your API
+
+👉 Rule of Thumb
+
+If you want fast go-live / minimal setup → use GenAI + Your Knowledge.
+
+If you want enterprise control / scalability → use OpenAI + AI Search + Blob.
